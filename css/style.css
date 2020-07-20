@@ -1,0 +1,150 @@
+/*-- Masthead --*/
+header.masthead {
+  position: relative;
+  background-color: #343a40;
+  background: url("../img/bg-masthead.jpg") no-repeat center center;
+  background-size: cover;
+  padding-top: 8em;
+  padding-bottom: 8em;
+}
+
+/*-- Masthead --*/
+header.masthead-sm {
+  position: relative;
+  background-color: #343a40;
+  background: url("../img/bg-masthead.jpg") no-repeat center center;
+  background-size: cover;
+  padding-top: 6em;
+  padding-bottom: 4em;
+}
+
+header.masthead .overlay, header.masthead-sm .overlay {
+  position: absolute;
+  background-color: #212529;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.3;
+}
+
+header.masthead h1 {
+  font-size: 2rem;
+}
+
+@media (min-width: 768px) {
+  header.masthead {
+    padding-top: 11rem;
+    padding-bottom: 9rem;
+  }
+  header.masthead-sm {
+    padding-top: 7rem;
+    padding-bottom: 5rem;
+  }
+  header.masthead-sm h1{
+    font-size: 3rem;
+  }
+  header.masthead h1 {
+    font-size: 3rem;
+  }
+}
+/*-- Masthead --*/
+
+
+
+
+
+/*-- icons --*/
+.features-icons {
+  padding-top: 7rem;
+  padding-bottom: 7rem;
+}
+
+.oi-blue {
+    color: #007bff !important;
+}
+
+.oi-lg {
+    font-size: 5em;
+}
+
+.oi-hover:hover {
+    font-size: 5.5em;
+}
+
+.check {
+    font-size: 2em;
+    border: 10px solid #007bff;
+}
+
+.check:hover {
+    font-size: 2.5em;
+}
+
+.features-icon-item {
+    height: 5.5em;
+}
+
+.contact-icons {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+/*-- icons --*/
+
+
+
+
+/*-- Showcase --*/
+.showcase .showcase-text {
+  padding: 3rem;
+}
+
+.showcase .showcase-img {
+  min-height: 30rem;
+  background-size: cover;
+}
+
+@media (min-width: 768px) {
+  .showcase .showcase-text {
+    padding: 7rem;
+  }
+}
+/*-- Showcase --*/
+
+
+
+
+
+/*-- Menu Buttons --*/
+.menu-btn {
+    font-size: 2em;
+    width: 50%;
+}
+@media screen and (max-width: 1199px) {
+    .menu-btn {
+        width: 60%; 
+    }
+}
+@media (max-width: 768px) {
+    .menu-btn {
+        width: 90%; 
+    }
+}
+/*-- Menu Buttons --*/
+
+
+
+
+/*-- Misc --*/
+.border-2 {
+    border-width: 2px !important;
+}
+.border-black {
+    border-color: #000000 !important;
+}
+@media (max-width: 768px) {
+    .border-remove {
+        border: none !important;
+    }
+}
+/*-- Misc --*/
