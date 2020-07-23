@@ -12,8 +12,7 @@ The demo version of this build will be built using local storage at first to mak
 
 Software Used:
 * Web Languages
-  - Duh
-  - Mix of Hardcoding and dynamic loading
+  - HTML - Mix of Hardcoding and dynamic loading
   - Custom CSS
   - Bootstrap 4
   - Iconic
