@@ -10,6 +10,9 @@ The goal was to create a responsive and ininteractive website to make tracking, 
 
 The demo version of this build will be built using local storage at first to make it easy for anyone to come and test out the project. The full version of the build will include a php and mySQL that will link to and interact with a database.
 
+**Want to try the Demo?**
+Simply download the files, login with the username "Admin", "Manager", or "User1" and the password "1234" and play around with it! Let me know what you think!
+
 Software Used:
 * Web Languages / Frameworks
   - HTML - Mix of Hardcoding and dynamic loading
