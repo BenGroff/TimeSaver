@@ -23,11 +23,12 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
     
     <script src="../js/jquery-3.5.1.min.js"></script>      <!-- jQuery -->
+    <script src="../js/popper.min.js"></script>            <!-- Popper -->
     <script src="../js/bootstrap.min.js"></script>         <!-- Bootstrap -->
     <script src="../js/main.js"></script>                  <!-- Custom -->
     
 </head>
-<body onload="checkPrivilege('menu.html');">
+<body onload="checkPrivilege('admin');">
     
     
     <!-- Navigation -->
@@ -67,7 +68,7 @@
                         </div>
                         <h3 class="py-3">Manage Users</h3>
                         <table id="userListTable" class="table table-sm table-bordered table-hover border-2 mb-3">
-                            <thead>
+                            <thead class="bg-primary" style="color: white;">
                                 <tr>
                                     <script>tableHeadings("UserList");</script>
                                 </tr>

@@ -27,7 +27,7 @@
     <script src="../js/main.js"></script>                  <!-- Custom -->
     
 </head>
-<body onload="checkPrivilege('menu.html');">
+<body onload="checkPrivilege('admin');" style="background-color: #f8f9fa;">
     
     
     <!-- Navigation -->
@@ -146,6 +146,7 @@
                                     <div class="col-sm-10 mx-auto text-right">
                                         <button id="saveEdit" type="submit" class="btn btn-primary px-5">Save</button>
                                         <button id="cancelEdit" type="button" onclick="cancelChanges('edit');" class="btn btn-danger px-5">Cancel</button>
+                                        <button id="deleteEdit" type="button" onclick="callDeleteUser();" class="btn btn-danger px-5">Delete <span class="oi" data-glyph="trash"></span></button>
                                     </div>
                                 </div>
                             </form>
