@@ -64,6 +64,14 @@ header.masthead h1 {
     color: #007bff !important;
 }
 
+.oi-red {
+    color: #dc3545 !important;
+}
+    
+.oi-green {
+   color: #28a745 !important; 
+}
+
 .oi-lg {
     font-size: 5em;
 }
@@ -146,5 +154,11 @@ header.masthead h1 {
     .border-remove {
         border: none !important;
     }
+}
+.user-select {
+    font-size: 1.2em;
+}
+.subTime {
+    width: 285px;
 }
 /*-- Misc --*/
