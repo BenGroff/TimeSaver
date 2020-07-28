@@ -11,11 +11,11 @@ The goal was to create a responsive and ininteractive website to make tracking, 
 The demo version of this build will be built using local storage at first to make it easy for anyone to come and test out the project. The full version of the build will include a php and mySQL that will link to and interact with a database.
 
 Software Used:
-* Web Languages
+* Web Languages / Frameworks
   - HTML - Mix of Hardcoding and dynamic loading
   - Custom CSS
   - Bootstrap 4
-  - Iconic
+  - Iconic Icons
   
 * Client-Side Languages
   - Custom JS / jQuery
