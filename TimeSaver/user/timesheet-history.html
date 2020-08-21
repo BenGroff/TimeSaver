@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timesheet History | TimeSaver</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Tab Icon -->
+    <link rel="icon" type="image/png" href="">
+    
+    <!-- Bootstrap 4 css -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    
+    <!-- Open Iconic CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic.min.css">
+    
+    <!-- TimeSaver css -->
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <!-- Google Font(s) -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    
+    <script src="../js/jquery-3.5.1.min.js"></script>                            <!-- jQuery -->
+    <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script> <!-- yui calendar -->
+    <script src="../js/popper.min.js"></script>                                  <!-- Popper -->
+    <script src="../js/bootstrap.min.js"></script>                               <!-- Bootstrap -->
+    <script src="../js/main.js"></script>                                        <!-- Custom -->
+    
+</head>
+<body onload="checkPrivilege('user');" style="background-color: #f8f9fa;" class="yui3-skin-sam">
+    
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-light fixed-top border-bottom">
+        <div class="container mr">
+            <a class="navbar-brand" href="../index.html"><strong>Time Saver</strong></a>
+            <div>
+                <a class="btn btn-primary px-5" href="../menu.html">Menu</a>
+                <a class="btn btn-primary px-5" onclick="logOut();" id="logOut" href="../login.html">Log Out</a>
+            </div>
+        </div>
+    </nav>
+    
+    
+    <!-- Masthead -->
+    <header class="masthead-sm text-white text-center">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto">
+                    <h1><strong>Timesheet History</strong></h1>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    
+    <!-- Edit Selected User -->
+    <section class="bg-light text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 my-5 py-0 py-md-5 border border-2 border-black border-remove">
+                    <div class="mx-auto mb-5 mb-lg-0 mb-lg-3">
+                        <div class="features-icon-item text-center">
+                            <span class="oi oi-blue oi-lg" data-glyph="spreadsheet"></span>
+                        </div>
+                        <h3 class="py-3">Timesheet History</h3>
+                        <div class="row">
+                            <div class="col-6 mx-auto">
+                                <h5 class="text-right">Name:</h5>
+                                <h5 class="text-right">Department:</h5>
+                                <h5 class="text-right">Title:</h5>
+                                <h5 class="text-right">Emp ID:</h5>
+                            </div>
+                            <div class="col-6 mx-auto">
+                                <script>
+                                    loadUserNT("time");
+                                </script>
+                            </div>
+                        </div>
+                        <div class="mt-5">
+                            <div class="row">
+                                <div class="col-11 mx-auto">
+                                    <div class="mb-5 border-top border-black border-2"></div>
+                                </div>
+                            </div>
+                            <div class="row mb-5">
+                                <div class="col-8 col-md-6 col-lg-4 text-center mx-auto">
+                                    <div class="yui3-g"> <!-- You need this skin class -->
+                                      <div class="yui3-u">
+                                         <!-- Container for the calendar -->
+                                         <div id="mycalendar" class="mx-auto"></div>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table table-sm table-bordered table-hover mb-3">
+                                <thead class="bg-primary" style="color: white;">
+                                    <tr>
+                                        <script>
+                                            tableHeadings("TimeHistory");    
+                                        </script>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <script>
+                                        timesheetListTable("user");
+                                    </script>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        YUI().use('calendar', 'datatype-date', 'cssbutton',  function(Y) {
+
+            // Create a new instance of calendar, placing it in
+            // #mycalendar container, setting its width to 340px,
+            // the flags for showing previous and next month's
+            // dates in available empty cells to true, and setting
+            // the date to today's date.
+            var calendar = new Y.Calendar({
+              contentBox: "#mycalendar",
+              width:'340px',
+              showPrevMonth: true,
+              showNextMonth: true,
+              date: new Date()}).render();
+
+            // Get a reference to Y.DataType.Date
+            var dtdate = Y.DataType.Date;
+
+            // Listen to calendar's selectionChange event.
+            calendar.on("selectionChange", function (ev) {
+
+              // Get the date from the list of selected
+              // dates returned with the event (since only
+              // single selection is enabled by default,
+              // we expect there to be only one date)
+              var newDate = ev.newSelection[0];
+
+              // Format the date and output it to a DOM
+              // element.
+              Y.one("#selecteddate").setHTML(dtdate.format(newDate));
+            });
+        });
+    </script>
+    
+    
+</body>
+</html>
