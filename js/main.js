@@ -33,6 +33,7 @@
 //        3J ** Deletes 'editTimesheet'
 //        3K ** Creates 'timesheetList' record
 //        3L ** Sets Default 'timesheetList' records
+//        3M ** Calls Approval or Denial
 //
 //    FUNC 4 ** Display / Fill Tables
 //        4A ** Creates Table Headings
@@ -565,7 +566,7 @@ $(document).ready(function (){
 });
 
 
-function showUserForm() {
+function showUserForm(type) {
     
     //removes edit user if coming from manage page
     localStorage.removeItem("editUser");
@@ -577,7 +578,15 @@ function showUserForm() {
     if (selection != "") {
         $("#editUserForm").removeClass("d-none");
         $("#userSelect").removeClass("mb-5");
-        fillUserForm();
+        if (type == null) {
+            fillUserForm();
+        }
+        else if (type == "manager") {
+            fillUserForm("manager");
+        }
+        else {
+            empTimesheetTable();
+        }
     }
     else {
         $("#editUserForm").addClass("d-none");
@@ -586,11 +595,15 @@ function showUserForm() {
 }
 
 
-function fillUserForm() {
+function fillUserForm(type) {
     
     //gets current user and userlist from storage
     var userList = JSON.parse(localStorage.getItem("userList"));
     var user = JSON.parse(localStorage.getItem("currentUser"));
+    
+    if (type == "manager") {
+        var selection = document.getElementById("userSelect").value; 
+    }
     
     //finds the user from userList and sets their info to rec variable
     for (var i = 0; i < userList.length; i++) {
@@ -600,8 +613,11 @@ function fillUserForm() {
                 break;
             }
         }
-        else if (user.privilege == "user") {
-            if (rec.organization == user.organization && user.employeeID == rec.employeeID){
+        else if (user.privilege == "user" || user.privilege == "manager") {
+            if (rec.organization == user.organization && user.employeeID == rec.employeeID && type == null){
+                break;
+            }
+            else if (rec.organization == user.organization && selection == rec.employeeID && type == "manager") {
                 break;
             }
         }
@@ -615,8 +631,11 @@ function fillUserForm() {
     document.getElementById("editDep").value = rec.department;
     document.getElementById("editTitle").value = rec.title;
     document.getElementById("editPriv").value = rec.privilege;
-    document.getElementById("editUser").value = rec.username;
-    document.getElementById("editPass").value = rec.password;
+    
+    if (type == null) {
+        document.getElementById("editUser").value = rec.username;
+        document.getElementById("editPass").value = rec.password;
+    }
     
     if (user.privilege == "admin") {
         
@@ -634,6 +653,8 @@ function fillUserForm() {
 
 function cancelChanges(form) {
     
+    var editTime = JSON.parse(localStorage.getItem("editTimesheet"));
+    
     //if navigating back to menu from form
     if (form == "menu" || form == "editMenu") {
         if (form == "editMenu" && $("#editUserForm").hasClass("d-none")) {
@@ -641,6 +662,9 @@ function cancelChanges(form) {
         }
         else {
             if (confirm('Are you sure you want to go to the menu? Any unsaved changes will be lost.')){
+                if (editTime != null) {
+                    deleteEditTime();
+                }
                 return true;
             }
             else {
@@ -654,7 +678,13 @@ function cancelChanges(form) {
 
             //if called from edit form
             if (form == "edit") {
-                location.reload();
+                if (editTime != null) {
+                    deleteEditTime();
+                    location.href = "timesheet-history.html";
+                }
+                else {
+                    location.reload();
+                }
             }
 
 
@@ -771,7 +801,9 @@ function createDefaultUsers() {
 //--------------------------------------------------------
 
 
-function saveTimeSheet() {
+function saveTimeSheet(type) {
+    
+    var totalHours = 0;
     
     //gets user record
     var user = JSON.parse(localStorage.getItem("currentUser"));
@@ -786,7 +818,9 @@ function saveTimeSheet() {
         "managerID" : user.managerID,
         "weekstart" : timeStart,
         "hours" : [],
+        "totalhours" : 0,
         "approved" : "ip"
+        
     }
     
     //pushes timesheet info into object
@@ -796,19 +830,30 @@ function saveTimeSheet() {
         var lunchOutID = "LunchIn" + i.toString();
         var timeOutID = "timeOut" + i.toString();
         var totalID = "total" + i.toString();
+        
+        //totals the hours
+        var h = parseFloat(document.getElementById(totalID).innerHTML);
+        totalHours = totalHours + h;
+        
         timeSheet.hours.push({
             "day" : getWeekDay(i),
             "timein" : document.getElementById(timeInID).value,
             "lunchout" : document.getElementById(lunchOutID).value,
             "lunchin" : document.getElementById(lunchInID).value,
             "timeout" : document.getElementById(timeOutID).value,
-            "total" : document.getElementById(totalID).value,
+            "total" : document.getElementById(totalID).innerHTML
         });
     }
     
+    //inserts total hours into obj
+    timeSheet.totalhours = totalHours;
+    
     //saves it to local storage
     localStorage.setItem("currentTimesheet", JSON.stringify(timeSheet));
-    alert("Timesheet saved.");
+    
+    if (type != 'submit') {
+        alert("Timesheet saved.");    
+    }
     
 }
 
@@ -819,10 +864,30 @@ function saveTimeSheet() {
 //--------------------------------------------------------
 
 
+function callEditTime(index) {
+    
+    //gets timesheet masterlist
+    var timesheetList = JSON.parse(localStorage.getItem("timesheetList"));
+    
+    //gets specific timesheet
+    var timesheet = timesheetList[index];
+    
+    //creates edittimesheet obj
+    localStorage.setItem("editTimesheet", JSON.stringify(timesheet));
+}
+
+
 //--------------------------------------------------------
 //  3J
 //  Deletes 'editTimesheet
 //--------------------------------------------------------
+
+
+function deleteEditTime() {
+    
+    //deletes editTimesheet from storage
+    localStorage.removeItem("editTimesheet")
+}
 
 
 //--------------------------------------------------------
@@ -831,7 +896,136 @@ function saveTimeSheet() {
 //--------------------------------------------------------
 
 
+function submitTimesheet() {
+    
+    //user confirmation of submission
+    if (confirm('Are you sure you want to submit this timesheet?')){
 
+        //gets current timesheet and checks for edit timesheet
+        var currTime = JSON.parse(localStorage.getItem("currentTimesheet"));
+        var editTime = JSON.parse(localStorage.getItem("editTimesheet"));
+
+        //if not editing record, saves current timesheet
+        if (editTime == null) {
+            saveTimeSheet('submit');
+        }
+
+        //runs through the days of the week
+        for (var i = 0; i < 7; i++) {
+
+            //document input ID's
+            var timeInID = "timeIn" + i.toString();
+            var lunchInID = "lunchOut" + i.toString();
+            var lunchOutID = "LunchIn" + i.toString();
+            var timeOutID = "timeOut" + i.toString();
+            var totalID = "total" + i.toString();
+
+
+            //validates submission
+            if (validateTimes(i, 'submit')) {
+                console.log("Line is valid.");
+            }
+            else {
+                return false;
+            }
+        }
+
+        //gets timesheetList
+        var timesheetList = JSON.parse(localStorage.getItem("timesheetList"));
+
+        //if submitting current timesheet
+        if (editTime == null) {
+            timesheetList.push(currTime);    
+        }
+        
+        //if editing timesheet
+        else {
+            //gets user
+            var user = JSON.parse(localStorage.getItem("currentUser"));
+            
+            //deletes old record and pushes new one
+            for (var i = 0; i < timesheetList.length; i++) {
+                if (timesheetList.employeeID == user.employeeID && timesheetList.organization == user.organization && timesheetList.weekstart == editTime.weekstart) {
+                    timesheetList.splice(i, 1);
+                    break;
+                }
+            }
+            timesheetList.push(editTime);
+        }
+        
+        //sets timesheetList
+        localStorage.setItem("timesheetList", JSON.stringify(timesheetList));
+        return true;
+        
+    }
+    else {
+        return false;
+    }
+    
+}
+
+
+function validateTimes(index, type) {
+    
+    //document input ID's
+    var timeInID = "timeIn" + index.toString();
+    var lunchInID = "lunchOut" + index.toString();
+    var lunchOutID = "LunchIn" + index.toString();
+    var timeOutID = "timeOut" + index.toString();
+    var totalID = "total" + index.toString();
+    
+    if (document.getElementById(timeOutID).value != "" && document.getElementById(timeInID).value != "" && document.getElementById(lunchOutID).value != "" && document.getElementById(lunchInID).value != "") {
+        return true;
+    }
+    
+    //gets times from table
+    var lunchOutTime = Date.parse("01 Jan 1970 " + document.getElementById(lunchOutID).value);
+    var lunchInTime = Date.parse("01 Jan 1970 " + document.getElementById(lunchInID).value);
+    var clockInTime = Date.parse("01 Jan 1970 " + document.getElementById(timeInID).value);
+    var clockOutTime = Date.parse("01 Jan 1970 " + document.getElementById(timeOutID).value);
+    
+    if (clockInTime > clockOutTime) {
+        alert("Time In cannot be greater than Time Out.");
+        return false;
+    }
+    else if ((document.getElementById(lunchInID).value != "" && document.getElementById(lunchOutID).value != "") && (lunchOutTime > lunchInTime)) {
+        alert("Lunch out time cannot be greater than lunch in time.");
+        return false;     
+    }
+    else if ((document.getElementById(lunchInID).value != "" && document.getElementById(lunchOutID).value != "") && (lunchOutTime > clockOutTime || lunchOutTime < clockInTime || lunchInTime > clockOutTime || lunchInTime < clockInTime)) {
+        alert("Lunch times must be within your Time in and Time out hours.");
+        return false;     
+    }
+    else if (type == 'submit') {
+        if (document.getElementById(timeInID).value == "" && document.getElementById(timeOutID).value != "") {
+            alert("You must be clocked in if you want to clock out.");
+            return false;
+        }
+        else if (document.getElementById(timeInID).value != "" && document.getElementById(timeOutID).value == "") {
+            alert("You must clock out if you are clocked in.");
+            return false;    
+        }
+        else if ((document.getElementById(timeInID).value == "" && document.getElementById(timeOutID).value == "") && (document.getElementById(lunchInID).value != "" || document.getElementById(lunchOutID).value != "")) {
+            alert("You cannot take a lunch break if you are not clocked in.");
+            return false;    
+        }
+        else if (document.getElementById(lunchInID).value != "" && document.getElementById(lunchOutID).value == "") {
+            alert("You must clock out for lunch if you are clocking in from lunch.");
+            return false;    
+        }
+        else if (document.getElementById(lunchInID).value == "" && document.getElementById(lunchOutID).value != "") {
+            alert("You must clock in from lunch if you clocked out for lunch.");
+            return false;    
+        }
+        else {
+            return true;
+        }
+    }
+    else {
+        return true;
+    }
+    
+}
 
 
 //--------------------------------------------------------
@@ -907,6 +1101,42 @@ function createDefaultTimesheets() {
         
     }
 }
+
+
+//--------------------------------------------------------
+//  3M
+//  Calls Approval or Denial of timesheet
+//--------------------------------------------------------
+
+
+function callApproval(index, type) {
+    
+    //if approved
+    if (type == "approve") {
+        
+        //gets confirmation
+        if (confirm("Are you sure your want to approve this timesheet?")) {
+            
+            //updates the timesheet and saves it
+            var timesheetList = JSON.parse(localStorage.getItem("timesheetList"));
+            timesheetList[index].approved = "Y";
+            localStorage.setItem("timesheetList", JSON.stringify(timesheetList));
+        }
+    }
+    
+    //if denied
+    else {
+        
+        //gets confirmation
+        if (confirm("Are you sure your want to deny this timesheet?")) {
+            
+            //updates the timesheet and saves it
+            var timesheetList = JSON.parse(localStorage.getItem("timesheetList"));
+            timesheetList[index].approved = "N";
+            localStorage.setItem("timesheetList", JSON.stringify(timesheetList));
+        }
+    }
+}
     
     
 //--------------------------------------------------------
@@ -942,7 +1172,13 @@ function tableHeadings(type) {
         headings = ['Date', 'Time In', 'Lunch', 'Time Out', 'Total'];
     }
     else if (type == "TimeHistory") {
-        headings = ['Week of', 'Manager ID', 'Total Hours', 'Status', '<span class="oi" data-glyph="eye"></span>', '<span class="oi" data-glyph="pencil"></span>'];
+        headings = ['Week of', 'Employee ID', 'Total Hours', 'Status', '<span class="oi" data-glyph="eye"></span>', '<span class="oi" data-glyph="pencil"></span>'];
+    }
+    else if (type == "ManTimeHist") {
+        headings = ['Week of', 'Employee ID', 'Total Hours', 'Status', '<span class="oi" data-glyph="eye"></span>'];
+    }
+    else if (type == "Approval") {
+        headings = ['Week of', 'Employee ID', 'Total Hours', 'Status', '<span class="oi" data-glyph="eye"></span>', '<span class="oi" data-glyph="check"></span>', '<span class="oi" data-glyph="x"></span>'];
     }
     
     //loop to create table headings
@@ -988,6 +1224,36 @@ function userListTable(type) {
 }
 
 
+function totalHours(i) {
+    
+    //document input ID's
+    var timeInID = "timeIn" + i.toString();
+    var lunchInID = "lunchOut" + i.toString();
+    var lunchOutID = "LunchIn" + i.toString();
+    var timeOutID = "timeOut" + i.toString();
+    var totalID = "total" + i.toString();
+
+    //if user is clocked in and out, and either clocked out and in for lunch or did not take lunch, get hours
+    if ((document.getElementById(timeInID).value != "" && document.getElementById(timeOutID).value != "") && ((document.getElementById(lunchInID).value != "" && document.getElementById(lunchOutID).value != "") || (document.getElementById(lunchInID).value == "" && document.getElementById(lunchOutID).value == ""))) {
+        
+        //validates, if valid gets hours
+        if (validateTimes(i, 'hours')) {
+            
+            //calculates hours
+            var lunchTime = Date.parse("01 Jan 1970 " + document.getElementById(lunchInID).value) - Date.parse("01 Jan 1970 " + document.getElementById(lunchOutID).value);
+            var totalTime = (Date.parse("01 Jan 1970 " + document.getElementById(timeOutID).value) - Date.parse("01 Jan 1970 " + document.getElementById(timeInID).value)) - lunchTime;
+        
+            //converts to hours, then rounds to nearest quarter hour
+            var hours = (totalTime / (1000 * 60 * 60)).toFixed(3);
+            var rHours = (Math.round(hours * 4) / 4).toFixed(2);
+            
+            //sets value in table
+            document.getElementById(totalID).innerHTML = rHours;
+       }
+    }
+}
+
+
 //--------------------------------------------------------
 //  4C
 //  Creates Time Table, fills if necessary
@@ -1007,9 +1273,9 @@ function timeTable() {
         document.write('<div class="form-group">' +
                        '<tr class="text-center">' +
                        '<th>' + day + ', <span id="' + dayID + '"> </span></th>' +
-                       '<td><input type="time" id="' + timeInID + '"></td>' +
-                       '<td><input type="time" id="' + lunchOutID + '"> - <input type="time" id="' + lunchInID + '"></td>' +
-                       '<td><input type="time" id="' + timeOutID + '"></td>' +
+                       '<td><input type="time" id="' + timeInID + '" onchange="totalHours(' + i + ')"></td>' +
+                       '<td><input type="time" id="' + lunchOutID + '" onchange="totalHours(' + i + ')"> - <input type="time" id="' + lunchInID + '" onchange="totalHours(' + i + ')"></td>' +
+                       '<td><input type="time" id="' + timeOutID + '" onchange="totalHours(' + i + ')"></td>' +
                        '<td id="' + totalID + '">0</td>' +
                        '</tr>' +
                        '</div>');
@@ -1017,11 +1283,52 @@ function timeTable() {
 }
 
 
-function fillTimeTable(timeDate) {
+function fillTimeTable(type) {
+    
+    var dateVals, m, d, y, timeDate;
     
     //gets current timesheet or edit timesheet
     var currTime = JSON.parse(localStorage.getItem("currentTimesheet"));
     var editTime = JSON.parse(localStorage.getItem("editTimesheet"));
+    
+    //if user is trying to edit / view a timesheet
+    if (editTime != null) {
+        datVals = editTime.weekstart.split("/");
+        m = parseInt(datVals[0]) - 1;
+        d = datVals[1];
+        y = datVals[2];
+        timeDate = new Date(y, m, d);
+    }
+    
+    //if current timesheet 
+    else if (currTime != null) {
+        
+        //gets the weekstart date from storage and sets it as a date
+        datVals = currTime.weekstart.split("/");
+        m = parseInt(datVals[0]) - 1;
+        d = datVals[1];
+        y = datVals[2];
+        timeDate = new Date(y, m, d);
+        
+        //first day of the week, tests to see if it is the same as current week timesheet
+        var fTest = timeDate.getDate() - timeDate.getDay();
+        var dayTest = new Date(timeDate.setDate(fTest));
+        var mTest = dayTest.getMonth();
+        var dTest = dayTest.getDate();
+        var yTest = dayTest.getFullYear();
+        dayTest = new Date(yTest, mTest, dTest);
+        
+        //if old timesheet, alerts user
+        if (dayTest > timeDate) {
+            alert("This is a timesheet from a previous week. To get to the current week, please submit the timesheet for approval.");
+        }
+        
+    }
+    
+    //if loading a new, unedited timesheet
+    else {
+        timeDate = new Date();
+    }
     
     
     //fills table
@@ -1055,8 +1362,15 @@ function fillTimeTable(timeDate) {
             document.getElementById(timeInID).value = editTime.hours[i].timein;
             document.getElementById(lunchOutID).value = editTime.hours[i].lunchout;
             document.getElementById(lunchInID).value = editTime.hours[i].lunchin;
+            
+            //this will not insert the time out value when editing
+            //I have no idea why and it's driving me crazy
+            //the code is the same for accessing the current timesheet though and that works just fine
             document.getElementById(timeOutID).value = editTime.hours[i].timeout;
-            document.getElementById(totalID).value = editTime.hours[i].total;
+            console.log("time out " + editTime.hours[i].timeout);
+            console.log(document.getElementById(timeOutID).value);
+            
+            document.getElementById(totalID).innerHTML = editTime.hours[i].total;
         }
         
         //if the user it editing current timesheet
@@ -1065,19 +1379,9 @@ function fillTimeTable(timeDate) {
             document.getElementById(lunchOutID).value = currTime.hours[i].lunchout;
             document.getElementById(lunchInID).value = currTime.hours[i].lunchin;
             document.getElementById(timeOutID).value = currTime.hours[i].timeout;
-            document.getElementById(totalID).value = currTime.hours[i].total;
+            document.getElementById(totalID).innerHTML = currTime.hours[i].total;
         }
     }
-    
-    //hides save button when user is editing a timecard, only lets them cancel or submit
-    //*** not working
-//    if (currTime != null) {
-//        $("#saveTime").addClass("d-none");
-//    }
-//    else {
-//        $("#saveTime").removeClass("d-none");
-//    }
-    
 }
 
 
@@ -1134,23 +1438,69 @@ function timesheetListTable(type) {
     for (var i = 0; i < timesheets.length; i++) {
         var rec = timesheets[i];
         
-        //if the user's belong to admin's org, write record
-        if ((rec.organization == user.organization && rec.employeeID == user.employeeID && type == "user") || (rec.organization == user.organization && rec.managerID == user.employeeID && type == "manager")) {
+        //if the user belongs to admin's org, write record
+        if ((rec.organization == user.organization && rec.employeeID == user.employeeID && type == "user") || (rec.organization == user.organization && rec.managerID == user.employeeID && type == "manager" && rec.approved == "AA")) {
             document.write('<tr class="text-center">' +
                            '<td>' + rec.weekstart + '</td>' +
-                           '<td>' + rec.managerID + '</td>' +
+                           '<td>' + rec.employeeID + '</td>' +
                            '<td>' + rec.totalhours + '</td>');
             if (rec.approved == "Y") {
-                document.write('<td><a href="edit.html" data-toggle="tooltip" data-placement="bottom" title="Approved"><span class="oi oi-green" data-glyph="check"></span></a></td>');
+                document.write('<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Approved" style="cursor:default;"><span class="oi oi-green" data-glyph="check"></span></a></td>');
             }
             else if (rec.approved == "N") {
-                document.write('<td><a href="edit.html" data-toggle="tooltip" data-placement="bottom" title="Denied"><span class="oi oi-red" data-glyph="x"></span></a></td>');
+                document.write('<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Denied" style="cursor:default;"><span class="oi oi-red" data-glyph="x"></span></a></td>');
             }
             else if (rec.approved == "AA") {
-                document.write('<td><a href="edit.html" data-toggle="tooltip" data-placement="bottom" title="Awaiting Review"><span class="oi oi-blue" data-glyph="aperture"></span></a></td>');
+                document.write('<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Awaiting Review" style="cursor:default;"><span class="oi oi-blue" data-glyph="aperture"></span></a></td>');
             }
-            document.write('<td><a href="view-timesheet.html" data-toggle="tooltip" data-placement="bottom" title="View Timesheet" onclick="callViewTime('+i+');"><span class="oi oi-blue" data-glyph="eye"></span></a></td><td><a href="timesheet.html" data-toggle="tooltip" data-placement="bottom" title="Edit" onclick="callEditTimesheet('+i+');"><span class="oi oi-blue" data-glyph="pencil"></span></a></td></tr>');
+            if (type == "user") {
+                document.write('<td><a href="timesheet.html" data-toggle="tooltip" data-placement="bottom" title="View Timesheet" onclick="callViewTime('+i+');"><span class="oi oi-blue" data-glyph="eye"></span></a></td><td><a href="timesheet.html" data-toggle="tooltip" data-placement="bottom" title="Edit" onclick="callEditTime('+i+');"><span class="oi oi-blue" data-glyph="pencil"></span></a></td></tr>');
+            }
+            else {
+                document.write('<td><a href="../user/timesheet.html" data-toggle="tooltip" data-placement="bottom" title="View Timesheet" onclick="callViewTime('+i+');"><span class="oi oi-blue" data-glyph="eye"></span></a></td><td><a href="timesheet-approval.html" data-toggle="tooltip" data-placement="bottom" title="Approve Timesheet" onclick="callApproval('+i+', ' + "'approve'" + ');"><span class="oi oi-green" data-glyph="check"></span></a></td><td><a href="timesheet-approval.html" data-toggle="tooltip" data-placement="bottom" title="Deny Timesheet" onclick="callApproval('+i+', ' + "'deny'" + ');"><span class="oi oi-red" data-glyph="x"></span></a></td></tr>');
+            }
         }
+    }
+}
+
+
+function empTimesheetTable() {
+    
+    //gets current user and timesheet list
+    var timesheets = JSON.parse(localStorage.getItem("timesheetList"));
+    var user = JSON.parse(localStorage.getItem("currentUser"));
+    
+    var selection = document.getElementById("userSelect").value;
+    var table = document.getElementById("empTime");
+    table.innerHTML = "";
+    var rowContent;
+    
+    //loops through list of all timesheets
+    for (var i = 0; i < timesheets.length; i++) {
+        var rec = timesheets[i];
+        
+        //if the user belongs to admin's org, write record
+        if (rec.organization == user.organization && selection == rec.employeeID) {
+            rowContent = '<tr class="text-center">' +
+                           '<td>' + rec.weekstart + '</td>' +
+                           '<td>' + rec.employeeID + '</td>' +
+                           '<td>' + rec.totalhours + '</td>';
+            if (rec.approved == "Y") {
+                rowContent += '<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Approved" style="cursor:default;"><span class="oi oi-green" data-glyph="check"></span></a></td>';
+            }
+            else if (rec.approved == "N") {
+                rowContent += '<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Denied" style="cursor:default;"><span class="oi oi-red" data-glyph="x"></span></a></td>';
+            }
+            else if (rec.approved == "AA") {
+                rowContent += '<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Awaiting Review" style="cursor:default;"><span class="oi oi-blue" data-glyph="aperture"></span></a></td>';
+            }
+            rowContent += '<td><a href="../user/timesheet.html" data-toggle="tooltip" data-placement="bottom" title="View Timesheet" onclick="callViewTime('+i+');"><span class="oi oi-blue" data-glyph="eye"></span></a></td></tr>';
+            table.innerHTML += rowContent;
+        }
+    }
+    
+    if (rowContent == null) {
+        table.innerHTML = '<tr class="text-center"><td colspan="5"><strong>There are no timesheets on record for this employee.</strong></td></tr>';
     }
 }
 
@@ -1177,7 +1527,7 @@ function timesheetListTable(type) {
 //--------------------------------------------------------
 
 
-function editUserSelect() {
+function editUserSelect(type) {
     
     //gets user list, current user, and edit user
     var userList = JSON.parse(localStorage.getItem("userList"));
@@ -1189,7 +1539,7 @@ function editUserSelect() {
         var rec = userList[i];
         
         //if the user's belong to admin's org, write record
-        if (rec.organization == user.organization) {
+        if (rec.organization == user.organization && type == null) {
             
             //if edit user record exists, set it as selected
             if (editUserRecord != null && rec.employeeID == editUserRecord.employeeID) {
@@ -1198,6 +1548,9 @@ function editUserSelect() {
             else {
                 document.write('<option value="' + rec.employeeID + '">' + rec.name + '</option>');
             }
+        }
+        else if (rec.organization == user.organization && type == "manager" && user.employeeID == rec.managerID) {
+            document.write('<option value="' + rec.employeeID + '">' + rec.name + '</option>');
         }
     }
 }
