@@ -774,7 +774,7 @@ function createDefaultUsers() {
     if (userList == null) {
         
         //list of organizations
-        var orgList = ["Brenntag NA", "Liberty University", "Truckers Paper Trail"];
+        var orgList = ["Sample Company", "Example LLC", "Testing Company"];
         var empIDList = ["XXXXXX", "234567", "345678", "456789", "567890"];
         var manIDList = ["XXXXXX", "234567", "234567", "234567", "678901"];
         var nameList = ["Administrator", "Jane Doe", "Billy Joel", "Mariah Carry", "Ben Groff"];
@@ -1048,7 +1048,7 @@ function createDefaultTimesheets() {
         timesheetList = [];
         
         //list of data to insert
-        var orgList = ["Brenntag NA", "Liberty University", "Truckers Paper Trail"];
+        var orgList = ["Sample Company", "Example LLC", "Testing Company"];
         var empIDList = ["234567", "345678"];
         var manIDList = "234567";
         var weekList = ["7/19/2020", "7/12/2020", "7/5/2020"];
