@@ -84,7 +84,7 @@
                                     <div class="mb-5 border-top border-black border-2"></div>
                                 </div>
                             </div>
-                            <form action="timesheet-history.html" onsubmit="submitTimesheet();">
+                            <form action="timesheet-history.html" onsubmit="return(submitTimesheet());">
                                 <table class="table table-sm table-bordered table-hover mb-3">
                                     <thead class="bg-primary" style="color: white;">
                                         <tr>
@@ -96,7 +96,7 @@
                                     <tbody>
                                         <script>
                                             timeTable();
-                                            fillTimeTable(new Date);
+                                            fillTimeTable();
                                         </script>
                                     </tbody>
                                     <div class="form-group"></div>
@@ -119,5 +119,32 @@
             </div>
         </div>
     </section>
+    
+    <script>
+        
+        //when dom is loaded
+        $(document).ready(function() {
+            
+            //gets edit time
+            var editTime = JSON.parse(localStorage.getItem("editTimesheet"));
+            
+            //if editing timesheet, removes save button, makes cancel button bigger
+            if (editTime != null) {
+                $("#saveTime").addClass("d-none");
+                $("#cancelEdit").addClass("subTime");
+            }
+//            else if (viewTime != null) {
+//                
+//            }
+            
+            //if current timesheet, shows all buttons as normal
+            else {
+                $("#saveTime").removeClass("d-none");
+                $("#cancelEdit").removeClass("subTime");
+            } 
+        }); 
+
+    </script>
+    
 </body>
 </html>

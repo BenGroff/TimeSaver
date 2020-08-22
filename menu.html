@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="description" content="">
     <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Tab Icon -->
     <link rel="icon" type="image/png" href="">
@@ -26,7 +27,7 @@
     <script src="js/main.js"></script>                  <!-- Custom -->
     
 </head>
-<body>
+<body onload="checkPrivilege('menu');">
     
     
     <!-- Navigation -->
@@ -49,7 +50,7 @@
                     <h1>Welcome to Time Saver!</h1>
                     <h2><u>Logged in as:</u></h2>
                     <script>
-                        loadUserNT();
+                        loadUserNT("menu");
                     </script>
                 </div>
             </div>
