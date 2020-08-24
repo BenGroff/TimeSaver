@@ -6,7 +6,7 @@ https://bengroff.github.io/TimeSaver/index.html
 This is part of my Liberty University Capstone project for my degree in Information Technology: Web and Mobile Programming. I would appreciate any feedback regarding any of my code, the UX design, organization, and whatever else you can think of!
 
 What is it:
-Time Saver was created to be an open source Time Sheet tracking application for businesses.
+Time Saver was created to be an open source timesheet tracking application for businesses.
 
 The goal was to create a responsive and ininteractive website to make tracking, recording, reporting, and approving time sheets simple. The main purpose of the site is to help companies who have outdated and inneficient time sheet systems that just consist of excel spreadsheets getting passed around and saved.
 
