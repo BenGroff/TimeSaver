@@ -1,5 +1,5 @@
 # TimeSaver
-**Time Saver Timesheet System**
+Time Saver Timesheet System
 
 https://bengroff.github.io/TimeSaver/index.html
 
