@@ -35,8 +35,8 @@
         <div class="container mr">
             <a class="navbar-brand" href="../index.html"><strong>Time Saver</strong></a>
             <div>
-                <a class="btn btn-primary px-5" href="../menu.html" onclick="return(cancelChanges('menu'))">Menu</a>
-                <a class="btn btn-primary px-5" onclick="logOut();" id="logOut" href="../login.html">Log Out</a>
+                <a id="menu-btn" class="btn btn-primary px-5" href="../menu.html" onclick="return(cancelChanges('menu'))">Menu</a>
+                <a class="btn btn-primary px-5" onclick="return(logOut());" id="logOut" href="../login.html">Log Out</a>
             </div>
         </div>
     </nav>
@@ -125,17 +125,25 @@
         //when dom is loaded
         $(document).ready(function() {
             
-            //gets edit time
+            //gets edit time and view time
             var editTime = JSON.parse(localStorage.getItem("editTimesheet"));
+            var viewTime = JSON.parse(localStorage.getItem("viewTimesheet"));
             
             //if editing timesheet, removes save button, makes cancel button bigger
             if (editTime != null) {
                 $("#saveTime").addClass("d-none");
                 $("#cancelEdit").addClass("subTime");
             }
-//            else if (viewTime != null) {
-//                
-//            }
+            
+            //if viewing timesheet, only includes back button
+            else if (viewTime != null) {
+                $("#saveTime").addClass("d-none");
+                $("#submitTime").addClass("d-none");
+                $("#cancelEdit").addClass("subTime");
+                $("#cancelEdit").html("Back");
+                $("#cancelEdit").attr("onclick", "cancelChanges('view');");
+                $("#menu-btn").attr("onclick", "return(cancelChanges('vMenu'))");
+            }
             
             //if current timesheet, shows all buttons as normal
             else {
