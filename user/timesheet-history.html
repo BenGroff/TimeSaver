@@ -87,8 +87,8 @@
                                 </div>
                             </div>
                             <div class="row mb-5">
-                                <div class="col-8 col-md-6 col-lg-4 text-center mx-auto">
-                                    <div class="yui3-g"> <!-- You need this skin class -->
+                                <div class="col-8 col-md-6 col-lg-4 text-center ml-0 ml-sm-auto mr-auto">
+                                    <div class="yui3-g">
                                       <div class="yui3-u">
                                          <!-- Container for the calendar -->
                                          <div id="mycalendar" class="mx-auto"></div>
@@ -96,20 +96,22 @@
                                     </div>
                                 </div>
                             </div>
-                            <table class="table table-sm table-bordered table-hover mb-3">
-                                <thead class="bg-primary" style="color: white;">
-                                    <tr>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered table-hover mb-3">
+                                    <thead class="bg-primary" style="color: white;">
+                                        <tr>
+                                            <script>
+                                                tableHeadings("TimeHistory");    
+                                            </script>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                         <script>
-                                            tableHeadings("TimeHistory");    
+                                            timesheetListTable("user");
                                         </script>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <script>
-                                        timesheetListTable("user");
-                                    </script>
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -120,11 +122,6 @@
     <script>
         YUI().use('calendar', 'datatype-date', 'cssbutton',  function(Y) {
 
-            // Create a new instance of calendar, placing it in
-            // #mycalendar container, setting its width to 340px,
-            // the flags for showing previous and next month's
-            // dates in available empty cells to true, and setting
-            // the date to today's date.
             var calendar = new Y.Calendar({
               contentBox: "#mycalendar",
               width:'340px',
@@ -132,20 +129,10 @@
               showNextMonth: true,
               date: new Date()}).render();
 
-            // Get a reference to Y.DataType.Date
             var dtdate = Y.DataType.Date;
 
-            // Listen to calendar's selectionChange event.
             calendar.on("selectionChange", function (ev) {
-
-              // Get the date from the list of selected
-              // dates returned with the event (since only
-              // single selection is enabled by default,
-              // we expect there to be only one date)
               var newDate = ev.newSelection[0];
-
-              // Format the date and output it to a DOM
-              // element.
               Y.one("#selecteddate").setHTML(dtdate.format(newDate));
             });
         });

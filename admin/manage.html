@@ -67,16 +67,18 @@
                             <span class="oi oi-blue oi-lg" data-glyph="people"></span>
                         </div>
                         <h3 class="py-3">Manage Users</h3>
-                        <table id="userListTable" class="table table-sm table-bordered table-hover border-2 mb-3">
-                            <thead class="bg-primary" style="color: white;">
-                                <tr>
-                                    <script>tableHeadings("UserList");</script>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <script>userListTable("UserList");</script>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table id="userListTable" class="table table-sm table-bordered table-hover border-2 mb-3">
+                                <thead class="bg-primary" style="color: white;">
+                                    <tr>
+                                        <script>tableHeadings("UserList");</script>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <script>userListTable("UserList");</script>
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="row">
                             <div class="col-10 mx-auto pt-5 border-top border-2 border-black">
                                 <a class="btn menu-btn btn-primary text-center py-2" id="newUser" href="create.html">New User</a>

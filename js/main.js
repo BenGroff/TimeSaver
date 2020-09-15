@@ -1543,13 +1543,13 @@ function empTimesheetTable() {
                            '<td>' + rec.employeeID + '</td>' +
                            '<td>' + rec.totalhours + '</td>';
             if (rec.approved == "Y") {
-                rowContent += '<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Approved" style="cursor:default;"><span class="oi oi-green" data-glyph="check"></span></a></td>';
+                rowContent += '<td><a data-toggle="tooltip" data-placement="bottom" title="Approved" style="cursor:default;"><span class="oi oi-green" data-glyph="check"></span></a></td>';
             }
             else if (rec.approved == "N") {
-                rowContent += '<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Denied" style="cursor:default;"><span class="oi oi-red" data-glyph="x"></span></a></td>';
+                rowContent += '<td><a data-toggle="tooltip" data-placement="bottom" title="Denied" style="cursor:default;"><span class="oi oi-red" data-glyph="x"></span></a></td>';
             }
             else if (rec.approved == "AA") {
-                rowContent += '<td><a href="" data-toggle="tooltip" data-placement="bottom" title="Awaiting Review" style="cursor:default;"><span class="oi oi-blue" data-glyph="aperture"></span></a></td>';
+                rowContent += '<td><a data-toggle="tooltip" data-placement="bottom" title="Awaiting Review" style="cursor:default;"><span class="oi oi-blue" data-glyph="aperture"></span></a></td>';
             }
             rowContent += '<td><a href="../user/timesheet.html" data-toggle="tooltip" data-placement="bottom" title="View Timesheet" onclick="callTime('+i+', ' + "'view'" + ');"><span class="oi oi-blue" data-glyph="eye"></span></a></td></tr>';
             table.innerHTML += rowContent;
